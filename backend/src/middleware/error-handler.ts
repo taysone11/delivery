@@ -1,8 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-
-interface HttpError extends Error {
-  statusCode?: number;
-}
+import type { HttpError } from '../types/http';
 
 export function errorHandler(err: HttpError, req: Request, res: Response, next: NextFunction): void {
   const statusCode = err.statusCode || 500;

@@ -5,27 +5,12 @@ import {
   findUserByEmail,
   getUserRoles,
   withTransaction
-} from '../repositories/auth-repository';
-import type { AuthUser, JwtPayloadData } from '../types/auth';
-import { hashPassword, verifyPassword } from '../utils/password';
-import { signJwt } from '../utils/jwt';
-
-interface RegisterInput {
-  email: string;
-  password: string;
-  fullName: string;
-  phone?: string;
-}
-
-interface LoginInput {
-  email: string;
-  password: string;
-}
-
-interface AuthResult {
-  token: string;
-  user: AuthUser;
-}
+} from '../../repositories/auth-repository';
+import type { JwtPayloadData } from '../../types/auth';
+import { createHttpError } from '../../types/http';
+import { hashPassword, verifyPassword } from '../../utils/password';
+import { signJwt } from '../../utils/jwt';
+import type { AuthResult, AuthUser, LoginInput, RegisterInput } from './auth-service.types';
 
 /**
  * Возвращает секрет, необходимый для подписи и проверки access-токенов.
@@ -72,22 +57,16 @@ export async function register(input: RegisterInput): Promise<AuthResult> {
   const phone = input.phone?.trim() || null;
 
   if (!email || !fullName || !input.password) {
-    const error = new Error('email, password and fullName are required');
-    (error as Error & { statusCode: number }).statusCode = 400;
-    throw error;
+    throw createHttpError('email, password and fullName are required', 400);
   }
 
   if (input.password.length < 6) {
-    const error = new Error('password must be at least 6 characters');
-    (error as Error & { statusCode: number }).statusCode = 400;
-    throw error;
+    throw createHttpError('password must be at least 6 characters', 400);
   }
 
   const existingUser = await findUserByEmail(email);
   if (existingUser) {
-    const error = new Error('User with this email already exists');
-    (error as Error & { statusCode: number }).statusCode = 409;
-    throw error;
+    throw createHttpError('User with this email already exists', 409);
   }
 
   const passwordHash = await hashPassword(input.password);
@@ -118,24 +97,18 @@ export async function login(input: LoginInput): Promise<AuthResult> {
   const email = input.email.trim().toLowerCase();
 
   if (!email || !input.password) {
-    const error = new Error('email and password are required');
-    (error as Error & { statusCode: number }).statusCode = 400;
-    throw error;
+    throw createHttpError('email and password are required', 400);
   }
 
   const user = await findUserByEmail(email);
 
   if (!user) {
-    const error = new Error('Invalid credentials');
-    (error as Error & { statusCode: number }).statusCode = 401;
-    throw error;
+    throw createHttpError('Invalid credentials', 401);
   }
 
   const isValid = await verifyPassword(input.password, user.passwordHash);
   if (!isValid) {
-    const error = new Error('Invalid credentials');
-    (error as Error & { statusCode: number }).statusCode = 401;
-    throw error;
+    throw createHttpError('Invalid credentials', 401);
   }
 
   const roles = await getUserRoles(user.id);
