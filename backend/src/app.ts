@@ -5,14 +5,21 @@ import morgan from 'morgan';
 import routes from './routes';
 import { notFound } from './middleware/not-found';
 import { errorHandler } from './middleware/error-handler';
+import { registerSwaggerDocs } from './docs/swagger-docs';
 
 export function createApp(): Express {
   const app = express();
 
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false
+    })
+  );
   app.use(cors());
   app.use(express.json());
   app.use(morgan('dev'));
+
+  registerSwaggerDocs(app);
 
   app.use('/api', routes);
 
