@@ -126,6 +126,14 @@ paths:
       description: Endpoint пока не реализован и возвращает 501.
       operationId: listCategories
       responses:
+        '200':
+          description: Список категорий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
         '501':
           description: Endpoint не реализован
           content:
@@ -140,6 +148,14 @@ paths:
       description: Endpoint пока не реализован и возвращает 501.
       operationId: listProducts
       responses:
+        '200':
+          description: Список товаров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
         '501':
           description: Endpoint не реализован
           content:
@@ -159,6 +175,12 @@ paths:
       security:
         - bearerAuth: []
       responses:
+        '200':
+          description: Корзина пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartView'
         '401':
           description: Не авторизован
           content:
@@ -189,7 +211,19 @@ paths:
       operationId: createOrder
       security:
         - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderInput'
       responses:
+        '201':
+          description: Заказ создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateOrderResult'
         '401':
           description: Не авторизован
           content:
@@ -312,3 +346,225 @@ components:
           description: JWT access-токен
         user:
           $ref: '#/components/schemas/AuthUser'
+
+    Category:
+      type: object
+      required: [id, name, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Роллы
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00.000Z'
+
+    Product:
+      type: object
+      required: [id, categoryId, name, description, price, weightGrams, imageUrl, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        categoryId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 1
+        name:
+          type: string
+          example: Филадельфия
+        description:
+          type: string
+          nullable: true
+          example: Ролл с лососем и сливочным сыром
+        price:
+          type: number
+          format: float
+          example: 590
+        weightGrams:
+          type: integer
+          nullable: true
+          example: 250
+        imageUrl:
+          type: string
+          nullable: true
+          example: https://cdn.example.com/rolls/philadelphia.jpg
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00.000Z'
+
+    Cart:
+      type: object
+      required: [id, userId, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 5
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:05:00.000Z'
+
+    CartItem:
+      type: object
+      required: [id, cartId, productId, quantity, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        cartId:
+          type: integer
+          format: int64
+          example: 5
+        productId:
+          type: integer
+          format: int64
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:05:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:05:00.000Z'
+
+    CartView:
+      type: object
+      required: [cart, items]
+      properties:
+        cart:
+          $ref: '#/components/schemas/Cart'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+
+    OrderStatus:
+      type: string
+      enum: [new, confirmed, preparing, delivering, completed, canceled]
+      example: new
+
+    PaymentMethod:
+      type: string
+      enum: [cash]
+      example: cash
+
+    PaymentStatus:
+      type: string
+      enum: [pending, paid]
+      example: pending
+
+    Order:
+      type: object
+      required: [id, userId, cartId, status, paymentMethod, paymentStatus, total, placedAt, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        userId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 1
+        cartId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 5
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+        total:
+          type: number
+          format: float
+          example: 1190
+        placedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:10:00.000Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:10:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:10:00.000Z'
+
+    OrderItem:
+      type: object
+      required: [id, orderId, productId, quantity, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 20
+        orderId:
+          type: integer
+          format: int64
+          example: 12
+        productId:
+          type: integer
+          format: int64
+          nullable: true
+          example: 1
+        quantity:
+          type: integer
+          example: 2
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:10:00.000Z'
+
+    CreateOrderInput:
+      type: object
+      required: [cartId]
+      properties:
+        cartId:
+          type: integer
+          format: int64
+          example: 5
+
+    CreateOrderResult:
+      type: object
+      required: [order, items]
+      properties:
+        order:
+          $ref: '#/components/schemas/Order'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
