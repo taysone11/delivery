@@ -1,6 +1,6 @@
-import type { PoolClient } from 'pg';
-import { getPool } from '../db/pool';
-import type { RoleCode } from '../types/auth';
+import type { PoolClient } from "pg";
+import { getPool } from "../db/pool";
+import type { RoleCode } from "../types/auth";
 
 export interface UserRow {
   id: number;
@@ -11,26 +11,28 @@ export interface UserRow {
 }
 
 const ROLE_NAMES: Record<RoleCode, string> = {
-  client: 'Клиент',
-  admin: 'Администратор',
-  courier: 'Курьер'
+  client: "Клиент",
+  admin: "Администратор",
+  courier: "Курьер",
 };
 
 /**
  * Выполняет callback внутри транзакции БД.
  * При успехе делает commit, при ошибке rollback.
  */
-export async function withTransaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
+export async function withTransaction<T>(
+  callback: (client: PoolClient) => Promise<T>,
+): Promise<T> {
   const pool = getPool();
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
     const result = await callback(client);
-    await client.query('COMMIT');
+    await client.query("COMMIT");
     return result;
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw error;
   } finally {
     client.release();
@@ -58,7 +60,12 @@ export async function findUserByEmail(email: string): Promise<UserRow | null> {
  */
 export async function createUser(
   client: PoolClient,
-  data: { email: string; phone: string | null; passwordHash: string; fullName: string }
+  data: {
+    email: string;
+    phone: string | null;
+    passwordHash: string;
+    fullName: string;
+  },
 ): Promise<UserRow> {
   const query = `
     INSERT INTO users (email, phone, password_hash, full_name)
@@ -66,22 +73,33 @@ export async function createUser(
     RETURNING id, email, phone, password_hash AS "passwordHash", full_name AS "fullName"
   `;
 
-  const result = await client.query<UserRow>(query, [data.email, data.phone, data.passwordHash, data.fullName]);
+  const result = await client.query<UserRow>(query, [
+    data.email,
+    data.phone,
+    data.passwordHash,
+    data.fullName,
+  ]);
   return result.rows[0];
 }
 
 /**
  * Гарантирует существование роли и возвращает её id.
  */
-export async function ensureRole(client: PoolClient, roleCode: RoleCode): Promise<number> {
-  const existing = await client.query<{ id: number }>('SELECT id FROM roles WHERE code = $1 LIMIT 1', [roleCode]);
+export async function ensureRole(
+  client: PoolClient,
+  roleCode: RoleCode,
+): Promise<number> {
+  const existing = await client.query<{ id: number }>(
+    "SELECT id FROM roles WHERE code = $1 LIMIT 1",
+    [roleCode],
+  );
   if (existing.rows[0]) {
     return existing.rows[0].id;
   }
 
   const created = await client.query<{ id: number }>(
-    'INSERT INTO roles (code, name) VALUES ($1, $2) RETURNING id',
-    [roleCode, ROLE_NAMES[roleCode]]
+    "INSERT INTO roles (code, name) VALUES ($1, $2) RETURNING id",
+    [roleCode, ROLE_NAMES[roleCode]],
   );
 
   return created.rows[0].id;
@@ -90,16 +108,19 @@ export async function ensureRole(client: PoolClient, roleCode: RoleCode): Promis
 /**
  * Назначает роль пользователю, если связи ещё нет.
  */
-export async function assignRole(client: PoolClient, userId: number, roleId: number): Promise<void> {
+export async function assignRole(
+  client: PoolClient,
+  userId: number,
+  roleId: number,
+): Promise<void> {
   await client.query(
-    'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) ON CONFLICT (user_id, role_id) DO NOTHING',
-    [userId, roleId]
+    "INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) ON CONFLICT (user_id, role_id) DO NOTHING",
+    [userId, roleId],
   );
 }
 
 /**
  * Возвращает роли пользователя, нормализованные к кодам ролей API.
- * Легаси-роль `customer` в БД маппится в `client`.
  */
 export async function getUserRoles(userId: number): Promise<RoleCode[]> {
   const pool = getPool();
@@ -120,11 +141,7 @@ export async function getUserRoles(userId: number): Promise<RoleCode[]> {
 }
 
 function normalizeRoleCode(code: string): RoleCode | null {
-  if (code === 'customer') {
-    return 'client';
-  }
-
-  if (code === 'client' || code === 'admin' || code === 'courier') {
+  if (code === "client" || code === "admin" || code === "courier") {
     return code;
   }
 

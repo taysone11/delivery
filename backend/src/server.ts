@@ -1,7 +1,7 @@
-import 'dotenv/config';
-import { createApp } from './app';
-import { getEnv } from './config/env';
-import { closePool, initPool } from './db/pool';
+import "dotenv/config";
+import { createApp } from "./app";
+import { getEnv } from "../env";
+import { closePool, initPool } from "./db/pool";
 
 async function bootstrap(): Promise<void> {
   const env = getEnv();
@@ -19,11 +19,11 @@ async function bootstrap(): Promise<void> {
     });
   };
 
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error('Failed to start server:', error);
+  console.error("Failed to start server:", error);
   process.exit(1);
 });

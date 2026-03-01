@@ -13,7 +13,7 @@ $$ LANGUAGE plpgsql;
 -- roles
 CREATE TABLE IF NOT EXISTS roles (
   id          SMALLSERIAL PRIMARY KEY,
-  code        VARCHAR(50) NOT NULL UNIQUE, -- admin, customer, courier
+  code        VARCHAR(50) NOT NULL UNIQUE, -- admin, client, courier
   name        VARCHAR(100) NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
