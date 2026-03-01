@@ -1,0 +1,20 @@
+.container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 2rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: #1c1c1c;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: #4a4a4a;
+}
