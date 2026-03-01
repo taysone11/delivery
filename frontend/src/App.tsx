@@ -1,6 +1,6 @@
 import { AppRouter } from './app/router';
 
-function App(): JSX.Element {
+function App() {
   return <AppRouter />;
 }
 

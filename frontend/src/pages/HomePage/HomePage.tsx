@@ -1,10 +1,10 @@
 import styles from './HomePage.module.css';
 
-export function HomePage(): JSX.Element {
+export function HomePage() {
   return (
-    <main className={styles.container}>
-      <h1 className={styles.title}>Sushi Delivery</h1>
-      <p className={styles.subtitle}>React 19 + Vite + TypeScript ready.</p>
-    </main>
+    <section className={styles.container}>
+      <h1 className={styles.title}>Доставка суши</h1>
+      <p className={styles.subtitle}>Домашняя страница приложения.</p>
+    </section>
   );
 }
