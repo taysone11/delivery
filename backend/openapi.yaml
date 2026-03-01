@@ -177,6 +177,47 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /products/{productId}:
+    get:
+      tags: [Products]
+      summary: Получить товар по id
+      description: Возвращает один товар по его идентификатору.
+      operationId: getProductById
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Идентификатор товара (положительное целое число).
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      responses:
+        "200":
+          description: Товар
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Некорректный productId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Товар не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /cart/me:
     get:
       tags: [Cart]
@@ -645,7 +686,7 @@ components:
 
     CartItem:
       type: object
-      required: [id, cartId, productId, quantity, createdAt, updatedAt]
+      required: [id, cartId, productId, price, quantity, createdAt, updatedAt]
       properties:
         id:
           type: integer
@@ -659,6 +700,10 @@ components:
           type: integer
           format: int64
           example: 1
+        price:
+          type: number
+          format: float
+          example: 590
         quantity:
           type: integer
           example: 2

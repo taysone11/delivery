@@ -18,6 +18,12 @@ export interface ListProductsRequest {
 
 export type ListProductsResponse = Product[];
 
+export interface GetProductByIdParams {
+  productId: number;
+}
+
+export type GetProductByIdResponse = Product;
+
 export interface ErrorResponse {
   error: string;
 }

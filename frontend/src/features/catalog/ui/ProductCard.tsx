@@ -1,10 +1,10 @@
-import { Button, Card, CardActions, CardContent, Stack, Typography } from '@mui/material';
+import { Button, Card, Flex, Typography } from 'antd';
 
 import type { Product } from '../../../shared/api/endpoints/products/products.types';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (productId: number) => Promise<void>;
+  onAddToCart: (product: Product) => Promise<void>;
   isAdding: boolean;
 }
 
@@ -16,40 +16,30 @@ export function ProductCard({ product, onAddToCart, isAdding }: ProductCardProps
   const weight = product.weightGrams ? `${product.weightGrams} г` : null;
 
   return (
-    <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Stack spacing={1}>
-          <Typography variant="h6" component="h3">
-            {product.name}
-          </Typography>
-          {product.description ? (
-            <Typography variant="body2" color="text.secondary">
-              {product.description}
-            </Typography>
-          ) : null}
-          <Typography variant="subtitle1" fontWeight={700}>
-            {formatPrice(product.price)}
-          </Typography>
-          {weight ? (
-            <Typography variant="caption" color="text.secondary">
-              {weight}
-            </Typography>
-          ) : null}
-        </Stack>
-      </CardContent>
+    <Card
+      size="small"
+      styles={{ body: { display: 'flex', flexDirection: 'column', gap: 12, minHeight: 220 } }}
+    >
+      <Flex vertical gap={8} style={{ flex: 1 }}>
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          {product.name}
+        </Typography.Title>
+        {product.description ? (
+          <Typography.Text type="secondary">{product.description}</Typography.Text>
+        ) : null}
+        <Typography.Text strong>{formatPrice(product.price)}</Typography.Text>
+        {weight ? <Typography.Text type="secondary">{weight}</Typography.Text> : null}
+      </Flex>
 
-      <CardActions>
-        <Button
-          variant="contained"
-          fullWidth
-          disabled={isAdding}
-          onClick={() => {
-            void onAddToCart(product.id);
-          }}
-        >
-          {isAdding ? 'Добавляем...' : 'В корзину'}
-        </Button>
-      </CardActions>
+      <Button
+        type="primary"
+        loading={isAdding}
+        onClick={() => {
+          void onAddToCart(product);
+        }}
+      >
+        В корзину
+      </Button>
     </Card>
   );
 }

@@ -11,6 +11,7 @@ export interface CartItem {
   id: number;
   cartId: number;
   productId: number;
+  price: number;
   quantity: number;
   // ISO 8601 date-time string
   createdAt: string;

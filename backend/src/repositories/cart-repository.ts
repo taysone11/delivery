@@ -12,6 +12,7 @@ interface CartItemRow {
   id: number;
   cartId: number;
   productId: number;
+  price: number;
   quantity: number;
   createdAt: string;
   updatedAt: string;
@@ -58,15 +59,17 @@ export async function listCartItems(cartId: number): Promise<CartItem[]> {
   const result = await pool.query<CartItemRow>(
     `
       SELECT
-        id,
-        cart_id AS "cartId",
-        product_id AS "productId",
-        quantity,
-        created_at AS "createdAt",
-        updated_at AS "updatedAt"
-      FROM cart_items
-      WHERE cart_id = $1
-      ORDER BY created_at ASC, id ASC
+        ci.id,
+        ci.cart_id AS "cartId",
+        ci.product_id AS "productId",
+        p.price,
+        ci.quantity,
+        ci.created_at AS "createdAt",
+        ci.updated_at AS "updatedAt"
+      FROM cart_items ci
+      INNER JOIN products p ON p.id = ci.product_id
+      WHERE ci.cart_id = $1
+      ORDER BY ci.created_at ASC, ci.id ASC
     `,
     [cartId]
   );
@@ -107,6 +110,7 @@ export async function addOrIncrementCartItem(
         id,
         cart_id AS "cartId",
         product_id AS "productId",
+        (SELECT price FROM products WHERE id = cart_items.product_id) AS "price",
         quantity,
         created_at AS "createdAt",
         updated_at AS "updatedAt"

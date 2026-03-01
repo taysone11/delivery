@@ -22,9 +22,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   isHydrated: false,
   hydrate: () => {
     const token = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+    const accessToken = token && token.trim().length > 0 ? token : null;
 
     set({
-      accessToken: token && token.trim().length > 0 ? token : null,
+      accessToken,
       isHydrated: true
     });
   },

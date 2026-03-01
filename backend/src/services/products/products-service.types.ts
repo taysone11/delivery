@@ -5,3 +5,9 @@ export interface ListProductsInput {
 }
 
 export type ListProductsResult = Product[];
+
+export interface GetProductByIdInput {
+  productId: number;
+}
+
+export type GetProductByIdResult = Product;

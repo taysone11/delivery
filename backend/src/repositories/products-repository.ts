@@ -13,6 +13,30 @@ interface ProductRow {
   updatedAt: string;
 }
 
+export async function findProductById(productId: number): Promise<Product | null> {
+  const pool = getPool();
+  const result = await pool.query<ProductRow>(
+    `
+      SELECT
+        id,
+        category_id AS "categoryId",
+        name,
+        description,
+        price,
+        weight_grams AS "weightGrams",
+        image_url AS "imageUrl",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+      FROM products
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [productId]
+  );
+
+  return result.rows[0] ?? null;
+}
+
 export async function listProductsByCategoryId(categoryId: number): Promise<Product[]> {
   const pool = getPool();
   const result = await pool.query<ProductRow>(

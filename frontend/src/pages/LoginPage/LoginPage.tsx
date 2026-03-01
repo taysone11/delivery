@@ -1,5 +1,5 @@
-import { type FormEvent, useMemo, useState } from 'react';
-import { Alert, Box, Button, Paper, Stack, TextField, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { Alert, Button, Card, Flex, Form, Input, Typography } from 'antd';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuthStore } from '../../features/auth/authStore';
@@ -19,11 +19,7 @@ export function LoginPage() {
 
   const fromPath = useMemo(() => getRedirectPath(location.state, '/'), [location.state]);
 
-  const [form, setForm] = useState<LoginFormState>({
-    email: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState<Partial<LoginFormState>>({});
+  const [form] = Form.useForm<LoginFormState>();
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,44 +27,12 @@ export function LoginPage() {
     return <Navigate to={fromPath} replace />;
   }
 
-  const handleEmailChange = (value: string) => {
-    setForm((prev) => ({ ...prev, email: value }));
-  };
-
-  const handlePasswordChange = (value: string) => {
-    setForm((prev) => ({ ...prev, password: value }));
-  };
-
-  const validate = (): boolean => {
-    const nextErrors: Partial<LoginFormState> = {};
-
-    if (!form.email.trim()) {
-      nextErrors.email = 'Введите email';
-    } else if (!form.email.includes('@')) {
-      nextErrors.email = 'Некорректный email';
-    }
-
-    if (!form.password.trim()) {
-      nextErrors.password = 'Введите пароль';
-    } else if (form.password.length < 6) {
-      nextErrors.password = 'Пароль должен быть не короче 6 символов';
-    }
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (values: LoginFormState): Promise<void> => {
     setRequestError(null);
-
-    if (!validate()) {
-      return;
-    }
 
     try {
       setIsSubmitting(true);
-      await authLogin(form.email.trim(), form.password);
+      await authLogin(values.email.trim(), values.password);
       navigate(fromPath, { replace: true });
     } catch (error: unknown) {
       setRequestError(getApiErrorMessage(error, 'Не удалось выполнить вход. Попробуйте снова.'));
@@ -78,51 +42,49 @@ export function LoginPage() {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 460, py: 4 }}>
-      <Paper elevation={1} sx={{ p: 3 }}>
-        <Stack component="form" spacing={2} onSubmit={handleSubmit} noValidate>
-          <Box>
-            <Typography variant="h5" component="h1">
+    <div style={{ width: '100%', maxWidth: 460, padding: '24px 0' }}>
+      <Card>
+        <Flex vertical gap={16}>
+          <div>
+            <Typography.Title level={3} style={{ margin: 0 }}>
               Вход
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            </Typography.Title>
+            <Typography.Text type="secondary">
               Введите данные аккаунта, чтобы продолжить.
-            </Typography>
-          </Box>
+            </Typography.Text>
+          </div>
 
-          <TextField
-            label="Email"
-            type="email"
-            value={form.email}
-            onChange={(event) => handleEmailChange(event.target.value)}
-            autoComplete="email"
-            placeholder="you@example.com"
-            error={Boolean(errors.email)}
-            helperText={errors.email}
-            disabled={isSubmitting}
-            fullWidth
-          />
+          <Form form={form} layout="vertical" onFinish={handleSubmit} disabled={isSubmitting}>
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: 'Введите email' },
+                { type: 'email', message: 'Некорректный email' }
+              ]}
+            >
+              <Input autoComplete="email" placeholder="you@example.com" />
+            </Form.Item>
 
-          <TextField
-            label="Пароль"
-            type="password"
-            value={form.password}
-            onChange={(event) => handlePasswordChange(event.target.value)}
-            autoComplete="current-password"
-            placeholder="••••••••"
-            error={Boolean(errors.password)}
-            helperText={errors.password}
-            disabled={isSubmitting}
-            fullWidth
-          />
+            <Form.Item
+              label="Пароль"
+              name="password"
+              rules={[
+                { required: true, message: 'Введите пароль' },
+                { min: 6, message: 'Пароль должен быть не короче 6 символов' }
+              ]}
+            >
+              <Input.Password autoComplete="current-password" placeholder="••••••••" />
+            </Form.Item>
 
-          {requestError ? <Alert severity="error">{requestError}</Alert> : null}
+            {requestError ? <Alert type="error" showIcon message={requestError} style={{ marginBottom: 16 }} /> : null}
 
-          <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Входим...' : 'Войти'}
-          </Button>
-        </Stack>
-      </Paper>
-    </Box>
+            <Button block type="primary" htmlType="submit" loading={isSubmitting}>
+              Войти
+            </Button>
+          </Form>
+        </Flex>
+      </Card>
+    </div>
   );
 }

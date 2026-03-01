@@ -1,5 +1,5 @@
-import { Box, Skeleton, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Menu, Segmented, Skeleton } from 'antd';
+import { Grid } from 'antd';
 
 import type { Category } from '../../../shared/api/endpoints/categories/categories.types';
 
@@ -16,52 +16,49 @@ export function CategoryTabs({
   onChange,
   loading
 }: CategoryTabsProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   if (loading) {
     return (
-      <Box sx={{ p: 2 }}>
-        <Skeleton variant="rounded" height={42} sx={{ mb: 1 }} />
-        <Skeleton variant="rounded" height={42} sx={{ mb: 1 }} />
-        <Skeleton variant="rounded" height={42} />
-      </Box>
+      <div style={{ padding: 12 }}>
+        <Skeleton active paragraph={{ rows: 3 }} title={false} />
+      </div>
     );
   }
 
   if (categories.length === 0) {
+    return <div style={{ padding: 12, color: '#6b7280' }}>Категории не найдены</div>;
+  }
+
+  const selected = selectedCategoryId ?? categories[0].id;
+
+  if (isMobile) {
     return (
-      <Box sx={{ p: 2 }}>
-        <Typography variant="body2" color="text.secondary">
-          Категории не найдены
-        </Typography>
-      </Box>
+      <div style={{ padding: 12 }}>
+        <Segmented
+          block
+          options={categories.map((category) => ({
+            label: category.name,
+            value: category.id
+          }))}
+          value={selected}
+          onChange={(value: string | number) => onChange(Number(value))}
+        />
+      </div>
     );
   }
 
-  const fallbackValue = categories[0]?.id ?? false;
-
   return (
-    <Tabs
-      orientation={isMobile ? 'horizontal' : 'vertical'}
-      value={selectedCategoryId ?? fallbackValue}
-      onChange={(_event, value: number) => onChange(value)}
-      variant={isMobile ? 'scrollable' : 'standard'}
-      scrollButtons={isMobile ? 'auto' : false}
-      sx={{
-        borderRight: isMobile ? 0 : 1,
-        borderColor: 'divider',
-        minHeight: isMobile ? 'auto' : 320
-      }}
-    >
-      {categories.map((category) => (
-        <Tab
-          key={category.id}
-          label={category.name}
-          value={category.id}
-          sx={{ alignItems: isMobile ? 'center' : 'flex-start' }}
-        />
-      ))}
-    </Tabs>
+    <Menu
+      mode="inline"
+      selectedKeys={[String(selected)]}
+      items={categories.map((category) => ({
+        key: String(category.id),
+        label: category.name
+      }))}
+      onClick={({ key }: { key: string }) => onChange(Number(key))}
+      style={{ borderInlineEnd: 0 }}
+    />
   );
 }
