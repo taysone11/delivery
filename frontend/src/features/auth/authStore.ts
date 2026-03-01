@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { login as loginRequest } from '../../shared/api/endpoints/auth/auth.endpoints';
+import { login as loginRequest, register as registerRequest } from '../../shared/api/endpoints/auth/auth.endpoints';
 import type { AuthUser } from '../../shared/api/endpoints/auth/auth.types';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
@@ -13,6 +13,12 @@ interface AuthState {
   isHydrated: boolean;
   hydrate: () => void;
   login: (email: string, password: string) => Promise<void>;
+  register: (payload: {
+    email: string;
+    password: string;
+    fullName: string;
+    phone?: string;
+  }) => Promise<void>;
   logout: () => void;
 }
 
@@ -31,6 +37,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   login: async (email: string, password: string) => {
     const response = await loginRequest({ email, password });
+    window.localStorage.setItem(ACCESS_TOKEN_KEY, response.token);
+
+    set({
+      accessToken: response.token,
+      user: response.user,
+      isHydrated: true
+    });
+  },
+  register: async (payload) => {
+    const response = await registerRequest(payload);
     window.localStorage.setItem(ACCESS_TOKEN_KEY, response.token);
 
     set({
