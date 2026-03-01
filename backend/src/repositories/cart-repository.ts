@@ -129,3 +129,35 @@ export async function removeCartItemByProductId(cartId: number, productId: numbe
 
   return (result.rowCount ?? 0) > 0;
 }
+
+export async function decrementCartItemQuantity(
+  cartId: number,
+  productId: number,
+  quantity: number
+): Promise<boolean> {
+  const pool = getPool();
+  const result = await pool.query<{ id: number; quantity: number }>(
+    `
+      WITH updated AS (
+        UPDATE cart_items
+        SET quantity = quantity - $3,
+            updated_at = NOW()
+        WHERE cart_id = $1 AND product_id = $2
+        RETURNING id, quantity
+      ),
+      deleted AS (
+        DELETE FROM cart_items
+        WHERE id IN (
+          SELECT id
+          FROM updated
+          WHERE quantity <= 0
+        )
+      )
+      SELECT id, quantity
+      FROM updated
+    `,
+    [cartId, productId, quantity]
+  );
+
+  return result.rows.length > 0;
+}

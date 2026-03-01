@@ -27,18 +27,18 @@ paths:
       description: Проверяет доступность API и соединение с PostgreSQL.
       operationId: getHealth
       responses:
-        '200':
+        "200":
           description: Сервис и база данных доступны
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
-        '500':
+                $ref: "#/components/schemas/HealthResponse"
+        "500":
           description: Ошибка сервиса
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /auth/register:
     post:
@@ -53,32 +53,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              $ref: "#/components/schemas/RegisterRequest"
       responses:
-        '201':
+        "201":
           description: Пользователь успешно зарегистрирован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
           description: Некорректные входные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
           description: Пользователь с таким email уже существует
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /auth/login:
     post:
@@ -91,32 +91,32 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: "#/components/schemas/LoginRequest"
       responses:
-        '200':
+        "200":
           description: Успешная аутентификация
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
           description: Некорректные входные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Неверные учетные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /categories:
     get:
@@ -125,20 +125,20 @@ paths:
       description: Возвращает все доступные категории.
       operationId: listCategories
       responses:
-        '200':
+        "200":
           description: Список категорий
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Category'
-        '500':
+                  $ref: "#/components/schemas/Category"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /products:
     get:
@@ -156,26 +156,26 @@ paths:
             minimum: 1
             example: 1
       responses:
-        '200':
+        "200":
           description: Список товаров
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '400':
+                  $ref: "#/components/schemas/Product"
+        "400":
           description: Некорректный или отсутствующий categoryId
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /cart/me:
     get:
@@ -189,30 +189,30 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        "200":
           description: Корзина пользователя
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartView'
-        '401':
+                $ref: "#/components/schemas/CartView"
+        "401":
           description: Не авторизован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Недостаточно прав
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /cart/items:
     post:
@@ -230,52 +230,118 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCartItemInput'
+              $ref: "#/components/schemas/AddCartItemInput"
       responses:
-        '200':
+        "200":
           description: Обновлённая корзина
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartView'
-        '400':
+                $ref: "#/components/schemas/CartView"
+        "400":
           description: Некорректные входные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Не авторизован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Недостаточно прав
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Товар не найден
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cart/items/{productId}/decrement:
+    patch:
+      tags: [Cart]
+      summary: Уменьшить количество товара в корзине
+      description: |
+        Требуется Bearer JWT.
+        Доступные роли: `client`, `admin`.
+        Уменьшает количество позиции в корзине.
+        Если количество становится меньше или равно нулю, позиция удаляется.
+      operationId: decrementCartItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Идентификатор товара.
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecrementCartItemInput"
+      responses:
+        "200":
+          description: Обновлённая корзина
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartView"
+        "400":
+          description: Некорректные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Позиция корзины не найдена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /cart/items/{productId}:
     delete:
       tags: [Cart]
-      summary: Удалить товар из корзины
+      summary: Удалить позицию товара из корзины
       description: |
         Требуется Bearer JWT.
         Доступные роли: `client`, `admin`.
+        Полностью удаляет товар из корзины независимо от текущего количества.
       operationId: removeCartItem
       security:
         - bearerAuth: []
@@ -289,42 +355,42 @@ paths:
             minimum: 1
             example: 1
       responses:
-        '200':
+        "200":
           description: Обновлённая корзина
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CartView'
-        '400':
+                $ref: "#/components/schemas/CartView"
+        "400":
           description: Некорректный productId
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Не авторизован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Недостаточно прав
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Позиция корзины не найдена
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /orders:
     post:
@@ -341,44 +407,44 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateOrderInput'
+              $ref: "#/components/schemas/CreateOrderInput"
       responses:
-        '201':
+        "201":
           description: Заказ создан
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateOrderResult'
-        '401':
+                $ref: "#/components/schemas/CreateOrderResult"
+        "401":
           description: Не авторизован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '403':
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
           description: Недостаточно прав
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Корзина не найдена
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '400':
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
           description: Некорректные входные данные или пустая корзина
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -412,7 +478,7 @@ components:
         timestamp:
           type: string
           format: date-time
-          example: '2026-02-28T20:10:00.000Z'
+          example: "2026-02-28T20:10:00.000Z"
 
     Role:
       type: string
@@ -437,11 +503,11 @@ components:
         phone:
           type: string
           nullable: true
-          example: '+79991234567'
+          example: "+79991234567"
         roles:
           type: array
           items:
-            $ref: '#/components/schemas/Role'
+            $ref: "#/components/schemas/Role"
 
     RegisterRequest:
       type: object
@@ -460,7 +526,7 @@ components:
           example: Иван Иванов
         phone:
           type: string
-          example: '+79991234567'
+          example: "+79991234567"
 
     LoginRequest:
       type: object
@@ -482,7 +548,7 @@ components:
           type: string
           description: JWT access-токен
         user:
-          $ref: '#/components/schemas/AuthUser'
+          $ref: "#/components/schemas/AuthUser"
 
     Category:
       type: object
@@ -498,15 +564,26 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:00:00.000Z'
+          example: "2026-03-01T10:00:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:00:00.000Z'
+          example: "2026-03-01T10:00:00.000Z"
 
     Product:
       type: object
-      required: [id, categoryId, name, description, price, weightGrams, imageUrl, createdAt, updatedAt]
+      required:
+        [
+          id,
+          categoryId,
+          name,
+          description,
+          price,
+          weightGrams,
+          imageUrl,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: integer
@@ -539,11 +616,11 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:00:00.000Z'
+          example: "2026-03-01T10:00:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:00:00.000Z'
+          example: "2026-03-01T10:00:00.000Z"
 
     Cart:
       type: object
@@ -560,11 +637,11 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:00:00.000Z'
+          example: "2026-03-01T10:00:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:05:00.000Z'
+          example: "2026-03-01T10:05:00.000Z"
 
     CartItem:
       type: object
@@ -588,22 +665,22 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:05:00.000Z'
+          example: "2026-03-01T10:05:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:05:00.000Z'
+          example: "2026-03-01T10:05:00.000Z"
 
     CartView:
       type: object
       required: [cart, items]
       properties:
         cart:
-          $ref: '#/components/schemas/Cart'
+          $ref: "#/components/schemas/Cart"
         items:
           type: array
           items:
-            $ref: '#/components/schemas/CartItem'
+            $ref: "#/components/schemas/CartItem"
 
     AddCartItemInput:
       type: object
@@ -619,6 +696,15 @@ components:
           minimum: 1
           default: 1
           example: 2
+
+    DecrementCartItemInput:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 1
 
     OrderStatus:
       type: string
@@ -637,7 +723,19 @@ components:
 
     Order:
       type: object
-      required: [id, userId, cartId, status, paymentMethod, paymentStatus, total, placedAt, createdAt, updatedAt]
+      required:
+        [
+          id,
+          userId,
+          cartId,
+          status,
+          paymentMethod,
+          paymentStatus,
+          total,
+          placedAt,
+          createdAt,
+          updatedAt,
+        ]
       properties:
         id:
           type: integer
@@ -654,11 +752,11 @@ components:
           nullable: true
           example: 5
         status:
-          $ref: '#/components/schemas/OrderStatus'
+          $ref: "#/components/schemas/OrderStatus"
         paymentMethod:
-          $ref: '#/components/schemas/PaymentMethod'
+          $ref: "#/components/schemas/PaymentMethod"
         paymentStatus:
-          $ref: '#/components/schemas/PaymentStatus'
+          $ref: "#/components/schemas/PaymentStatus"
         total:
           type: number
           format: float
@@ -666,15 +764,15 @@ components:
         placedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:10:00.000Z'
+          example: "2026-03-01T10:10:00.000Z"
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:10:00.000Z'
+          example: "2026-03-01T10:10:00.000Z"
         updatedAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:10:00.000Z'
+          example: "2026-03-01T10:10:00.000Z"
 
     OrderItem:
       type: object
@@ -699,7 +797,7 @@ components:
         createdAt:
           type: string
           format: date-time
-          example: '2026-03-01T10:10:00.000Z'
+          example: "2026-03-01T10:10:00.000Z"
 
     CreateOrderInput:
       type: object
@@ -715,8 +813,8 @@ components:
       required: [order, items]
       properties:
         order:
-          $ref: '#/components/schemas/Order'
+          $ref: "#/components/schemas/Order"
         items:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
+            $ref: "#/components/schemas/OrderItem"

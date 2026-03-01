@@ -9,3 +9,7 @@ export interface AddCartItemInput {
   productId: number;
   quantity?: number;
 }
+
+export interface DecrementCartItemInput {
+  quantity?: number;
+}
