@@ -14,6 +14,10 @@ function assertUserId(userId: number): void {
   }
 }
 
+/**
+ * Возвращает корзину текущего пользователя.
+ * Если корзина отсутствует, создаёт пустую и возвращает её вместе со списком позиций.
+ */
 export async function getMyCartService(userId: number): Promise<CartView> {
   assertUserId(userId);
 
@@ -23,6 +27,10 @@ export async function getMyCartService(userId: number): Promise<CartView> {
   return { cart, items };
 }
 
+/**
+ * Добавляет товар в корзину пользователя.
+ * Если товар уже присутствует в корзине, увеличивает его количество на переданное значение.
+ */
 export async function addCartItemService(userId: number, input: AddCartItemInput): Promise<CartView> {
   assertUserId(userId);
 
@@ -47,6 +55,10 @@ export async function addCartItemService(userId: number, input: AddCartItemInput
   return { cart, items };
 }
 
+/**
+ * Удаляет позицию товара из корзины пользователя по productId.
+ * Возвращает обновлённое состояние корзины.
+ */
 export async function removeCartItemService(userId: number, productId: number): Promise<CartView> {
   assertUserId(userId);
 

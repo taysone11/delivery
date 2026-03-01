@@ -10,6 +10,12 @@ import type { OrderItem } from '../../types/entities';
 import { createHttpError } from '../../types/http';
 import type { CreateOrderInput, CreateOrderResult } from './orders-service.types';
 
+/**
+ * Создаёт заказ из корзины пользователя:
+ * проверяет принадлежность корзины и её заполненность,
+ * рассчитывает итоговую сумму, переносит позиции в order_items
+ * и очищает корзину после успешного создания заказа.
+ */
 export async function createOrderService(userId: number, input: CreateOrderInput): Promise<CreateOrderResult> {
   if (!Number.isInteger(userId) || userId <= 0) {
     throw createHttpError('Invalid user id', 400);
