@@ -4,3 +4,8 @@ export interface CartView {
   cart: Cart;
   items: CartItem[];
 }
+
+export interface AddCartItemInput {
+  productId: number;
+  quantity?: number;
+}

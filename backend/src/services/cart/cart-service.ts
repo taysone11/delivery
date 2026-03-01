@@ -1,7 +1,65 @@
+import {
+  addOrIncrementCartItem,
+  getOrCreateCartByUserId,
+  isProductExists,
+  listCartItems,
+  removeCartItemByProductId
+} from '../../repositories/cart-repository';
 import { createHttpError } from '../../types/http';
-import type { CartView } from './cart-service.types';
+import type { AddCartItemInput, CartView } from './cart-service.types';
+
+function assertUserId(userId: number): void {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw createHttpError('Invalid user id', 400);
+  }
+}
 
 export async function getMyCartService(userId: number): Promise<CartView> {
-  void userId;
-  throw createHttpError('Not implemented yet', 501);
+  assertUserId(userId);
+
+  const cart = await getOrCreateCartByUserId(userId);
+  const items = await listCartItems(cart.id);
+
+  return { cart, items };
+}
+
+export async function addCartItemService(userId: number, input: AddCartItemInput): Promise<CartView> {
+  assertUserId(userId);
+
+  if (!Number.isInteger(input?.productId) || input.productId <= 0) {
+    throw createHttpError('productId must be a positive integer', 400);
+  }
+
+  const quantity = input.quantity ?? 1;
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    throw createHttpError('quantity must be a positive integer', 400);
+  }
+
+  const productExists = await isProductExists(input.productId);
+  if (!productExists) {
+    throw createHttpError('Product not found', 404);
+  }
+
+  const cart = await getOrCreateCartByUserId(userId);
+  await addOrIncrementCartItem(cart.id, input.productId, quantity);
+  const items = await listCartItems(cart.id);
+
+  return { cart, items };
+}
+
+export async function removeCartItemService(userId: number, productId: number): Promise<CartView> {
+  assertUserId(userId);
+
+  if (!Number.isInteger(productId) || productId <= 0) {
+    throw createHttpError('productId must be a positive integer', 400);
+  }
+
+  const cart = await getOrCreateCartByUserId(userId);
+  const removed = await removeCartItemByProductId(cart.id, productId);
+  if (!removed) {
+    throw createHttpError('Cart item not found', 404);
+  }
+
+  const items = await listCartItems(cart.id);
+  return { cart, items };
 }

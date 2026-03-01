@@ -6,8 +6,7 @@ info:
     OpenAPI-спецификация backend-сервиса доставки еды из суши-бара.
 
     Текущий статус:
-    - Реализованы: auth (register/login), health-check.
-    - В разработке: categories/products/cart/orders (сейчас отдают 501).
+    - Реализованы: auth (register/login), health-check, categories, products (с фильтром по categoryId), cart, orders.
 servers:
   - url: http://localhost:3000/api
     description: Local development
@@ -123,7 +122,7 @@ paths:
     get:
       tags: [Categories]
       summary: Получить список категорий
-      description: Endpoint пока не реализован и возвращает 501.
+      description: Возвращает все доступные категории.
       operationId: listCategories
       responses:
         '200':
@@ -134,8 +133,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Category'
-        '501':
-          description: Endpoint не реализован
+        '500':
+          description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
@@ -145,8 +144,17 @@ paths:
     get:
       tags: [Products]
       summary: Получить список товаров
-      description: Endpoint пока не реализован и возвращает 501.
+      description: Возвращает товары конкретной категории по `categoryId`.
       operationId: listProducts
+      parameters:
+        - name: categoryId
+          in: query
+          required: true
+          description: Идентификатор категории (положительное целое число).
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
       responses:
         '200':
           description: Список товаров
@@ -156,8 +164,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
-        '501':
-          description: Endpoint не реализован
+        '400':
+          description: Некорректный или отсутствующий categoryId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
@@ -170,7 +184,7 @@ paths:
       description: |
         Требуется Bearer JWT.
         Доступные роли: `client`, `admin`.
-        Endpoint пока не реализован и возвращает 501.
+        Если корзины нет, она создаётся автоматически.
       operationId: getMyCart
       security:
         - bearerAuth: []
@@ -193,8 +207,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '501':
-          description: Endpoint не реализован
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Добавить товар в корзину
+      description: |
+        Требуется Bearer JWT.
+        Доступные роли: `client`, `admin`.
+        Добавляет позицию в корзину или увеличивает количество, если товар уже есть.
+      operationId: addCartItem
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddCartItemInput'
+      responses:
+        '200':
+          description: Обновлённая корзина
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartView'
+        '400':
+          description: Некорректные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Товар не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/items/{productId}:
+    delete:
+      tags: [Cart]
+      summary: Удалить товар из корзины
+      description: |
+        Требуется Bearer JWT.
+        Доступные роли: `client`, `admin`.
+      operationId: removeCartItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Идентификатор товара.
+          schema:
+            type: integer
+            minimum: 1
+            example: 1
+      responses:
+        '200':
+          description: Обновлённая корзина
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartView'
+        '400':
+          description: Некорректный productId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Позиция корзины не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
@@ -207,7 +333,6 @@ paths:
       description: |
         Требуется Bearer JWT.
         Доступные роли: `client`, `admin`.
-        Endpoint пока не реализован и возвращает 501.
       operationId: createOrder
       security:
         - bearerAuth: []
@@ -236,8 +361,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '501':
-          description: Endpoint не реализован
+        '404':
+          description: Корзина не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Некорректные входные данные или пустая корзина
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
           content:
             application/json:
               schema:
@@ -467,6 +604,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CartItem'
+
+    AddCartItemInput:
+      type: object
+      required: [productId]
+      properties:
+        productId:
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 2
 
     OrderStatus:
       type: string

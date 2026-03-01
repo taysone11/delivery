@@ -1,6 +1,6 @@
 import type { ListCategoriesResult } from './categories-service.types';
-import { createHttpError } from '../../types/http';
+import { listCategories } from '../../repositories/categories-repository';
 
 export async function listCategoriesService(): Promise<ListCategoriesResult> {
-  throw createHttpError('Not implemented yet', 501);
+  return listCategories();
 }

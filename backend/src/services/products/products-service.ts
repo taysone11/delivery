@@ -1,6 +1,6 @@
-import type { ListProductsResult } from './products-service.types';
-import { createHttpError } from '../../types/http';
+import { listProductsByCategoryId } from '../../repositories/products-repository';
+import type { ListProductsInput, ListProductsResult } from './products-service.types';
 
-export async function listProductsService(): Promise<ListProductsResult> {
-  throw createHttpError('Not implemented yet', 501);
+export async function listProductsService(input: ListProductsInput): Promise<ListProductsResult> {
+  return listProductsByCategoryId(input.categoryId);
 }
