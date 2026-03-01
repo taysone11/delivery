@@ -10,3 +10,15 @@
   margin-top: 0.75rem;
   color: #4d4d4d;
 }
+
+.logoutButton {
+  margin-top: 1rem;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #1f1f1f;
+  color: #ffffff;
+  cursor: pointer;
+}

@@ -1,14 +1,12 @@
 import { NavLink } from 'react-router-dom';
 
+import { useAuthStore } from '../../../features/auth/authStore';
 import styles from './Header.module.css';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Главная' },
   { to: '/catalog', label: 'Каталог' },
-  { to: '/cart', label: 'Корзина' },
-  { to: '/checkout', label: 'Оформление' },
-  { to: '/login', label: 'Вход' },
-  { to: '/profile', label: 'Профиль' }
+  { to: '/cart', label: 'Корзина' }
 ] as const;
 
 function getNavLinkClassName({ isActive }: { isActive: boolean }): string {
@@ -16,6 +14,11 @@ function getNavLinkClassName({ isActive }: { isActive: boolean }): string {
 }
 
 export function Header() {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const authNavItem = accessToken
+    ? { to: '/profile', label: 'Профиль' }
+    : { to: '/login', label: 'Вход' };
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -28,6 +31,9 @@ export function Header() {
               {item.label}
             </NavLink>
           ))}
+          <NavLink to={authNavItem.to} className={getNavLinkClassName}>
+            {authNavItem.label}
+          </NavLink>
         </nav>
         <div className={styles.cartIndicator} aria-label="Количество товаров в корзине">
           Корзина: <span className={styles.badge}>0</span>
