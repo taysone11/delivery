@@ -4,12 +4,12 @@
 }
 
 .inner {
-  width: min(1100px, 100% - 2rem);
+  width: min(1100px, calc(100% - 32px));
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 16px;
   min-height: 64px;
 }
 
@@ -22,15 +22,15 @@
 .nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .link {
   text-decoration: none;
   color: #4f4f4f;
   font-weight: 500;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.4rem;
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
 .active {
@@ -44,14 +44,15 @@
 }
 
 .badge {
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.4rem;
-  height: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
   border-radius: 999px;
   background: #111111;
   color: #ffffff;
-  font-size: 0.8rem;
-  margin-left: 0.25rem;
-  padding: 0 0.35rem;
+  font-size: 12px;
+  margin-left: 4px;
+  padding: 0 6px;
 }
