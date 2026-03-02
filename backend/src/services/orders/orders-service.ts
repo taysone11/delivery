@@ -4,11 +4,13 @@ import {
   createOrderItem,
   findUserCartById,
   getCartItemsWithPrice,
+  listOrderItemsByOrderIds,
+  listOrdersByUserId,
   withTransaction
 } from '../../repositories/orders-repository';
 import type { OrderItem } from '../../types/entities';
 import { createHttpError } from '../../types/http';
-import type { CreateOrderInput, CreateOrderResult } from './orders-service.types';
+import type { CreateOrderInput, CreateOrderResult, GetMyOrdersResult, OrderWithItems } from './orders-service.types';
 
 /**
  * Создаёт заказ из корзины пользователя:
@@ -70,4 +72,28 @@ export async function createOrderService(userId: number, input: CreateOrderInput
 
     return { order, items };
   });
+}
+
+export async function getMyOrdersService(userId: number): Promise<GetMyOrdersResult> {
+  if (!Number.isInteger(userId) || userId <= 0) {
+    throw createHttpError('Invalid user id', 400);
+  }
+
+  const orders = await listOrdersByUserId(userId);
+  const orderIds = orders.map((order) => order.id);
+  const allItems = await listOrderItemsByOrderIds(orderIds);
+
+  const itemsByOrderId = allItems.reduce<Map<number, OrderItem[]>>((acc, item) => {
+    const bucket = acc.get(item.orderId) || [];
+    bucket.push(item);
+    acc.set(item.orderId, bucket);
+    return acc;
+  }, new Map());
+
+  const result: OrderWithItems[] = orders.map((order) => ({
+    order,
+    items: itemsByOrderId.get(order.id) || []
+  }));
+
+  return { orders: result };
 }

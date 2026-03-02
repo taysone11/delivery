@@ -10,3 +10,12 @@ export interface CreateOrderResult {
   order: Order;
   items: OrderItem[];
 }
+
+export interface OrderWithItems {
+  order: Order;
+  items: OrderItem[];
+}
+
+export interface GetMyOrdersResult {
+  orders: OrderWithItems[];
+}

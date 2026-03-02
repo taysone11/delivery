@@ -9,6 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "db:seed": "tsx db/seeds/seed.ts",
+    "db:seed:products": "tsx db/seeds/seed-products.ts",
     "db:seed:clear": "tsx db/seeds/clear.ts",
     "db:seed:fresh": "yarn db:seed:clear && yarn db:seed"
   },

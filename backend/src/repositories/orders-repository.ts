@@ -34,6 +34,7 @@ interface OrderItemRow {
   id: number;
   orderId: number;
   productId: number | null;
+  productName?: string | null;
   quantity: number;
   createdAt: string;
 }
@@ -134,6 +135,59 @@ export async function createOrder(
   );
 
   return toOrder(result.rows[0]);
+}
+
+export async function listOrdersByUserId(userId: number): Promise<Order[]> {
+  const pool = getPool();
+  const result = await pool.query<OrderRow>(
+    `
+      SELECT
+        id,
+        user_id AS "userId",
+        cart_id AS "cartId",
+        address,
+        comment,
+        status,
+        payment_method AS "paymentMethod",
+        payment_status AS "paymentStatus",
+        total::text AS "total",
+        placed_at AS "placedAt",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+      FROM orders
+      WHERE user_id = $1
+      ORDER BY created_at DESC, id DESC
+    `,
+    [userId]
+  );
+
+  return result.rows.map(toOrder);
+}
+
+export async function listOrderItemsByOrderIds(orderIds: number[]): Promise<OrderItem[]> {
+  if (orderIds.length === 0) {
+    return [];
+  }
+
+  const pool = getPool();
+  const result = await pool.query<OrderItemRow>(
+    `
+      SELECT
+        oi.id,
+        oi.order_id AS "orderId",
+        oi.product_id AS "productId",
+        p.name AS "productName",
+        oi.quantity,
+        oi.created_at AS "createdAt"
+      FROM order_items oi
+      LEFT JOIN products p ON p.id = oi.product_id
+      WHERE oi.order_id = ANY($1::bigint[])
+      ORDER BY oi.order_id DESC, oi.id ASC
+    `,
+    [orderIds]
+  );
+
+  return result.rows;
 }
 
 export async function createOrderItem(

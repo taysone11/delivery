@@ -32,6 +32,7 @@ export interface OrderItem {
   id: number;
   orderId: number;
   productId: number | null;
+  productName?: string | null;
   quantity: number;
   // ISO 8601 date-time string
   createdAt: string;
@@ -44,6 +45,15 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
+  order: Order;
+  items: OrderItem[];
+}
+
+export interface GetMyOrdersResponse {
+  orders: OrderWithItems[];
+}
+
+export interface OrderWithItems {
   order: Order;
   items: OrderItem[];
 }

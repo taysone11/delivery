@@ -21,6 +21,7 @@ export interface OrderItem {
   id: number;
   orderId: number;
   productId: number | null;
+  productName?: string | null;
   quantity: number;
   createdAt: string;
 }

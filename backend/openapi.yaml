@@ -487,6 +487,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /orders/my:
+    get:
+      tags: [Orders]
+      summary: Получить заказы текущего пользователя
+      description: |
+        Требуется Bearer JWT.
+        Доступные роли: `client`, `admin`.
+      operationId: getMyOrders
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Список заказов пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMyOrdersResult"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -845,6 +881,10 @@ components:
           format: int64
           nullable: true
           example: 1
+        productName:
+          type: string
+          nullable: true
+          example: Филадельфия
         quantity:
           type: integer
           example: 2
@@ -870,6 +910,26 @@ components:
           example: Без васаби
 
     CreateOrderResult:
+      type: object
+      required: [order, items]
+      properties:
+        order:
+          $ref: "#/components/schemas/Order"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+
+    GetMyOrdersResult:
+      type: object
+      required: [orders]
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderWithItems"
+
+    OrderWithItems:
       type: object
       required: [order, items]
       properties:
