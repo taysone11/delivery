@@ -1,156 +1,93 @@
 # Sushi Delivery Backend
 
-Backend-сервис для веб-приложения доставки еды из суши-бара.
+REST API для приложения доставки суши.
 
-## Технологии
+## Требования
 
-- Node.js 20+
-- Express
-- TypeScript
-- PostgreSQL (`pg`)
-
-## Структура проекта
-
-```text
-backend/
-  db/
-    migrations/
-      V1__init.sql
-  src/
-    app.ts
-    server.ts
-    config/
-      env.ts
-    controllers/
-    middleware/
-    repositories/
-    routes/
-    services/
-      auth/
-        auth-service.ts
-        auth-service.types.ts
-      cart/
-        cart-service.ts
-        cart-service.types.ts
-      categories/
-        categories-service.ts
-        categories-service.types.ts
-      products/
-        products-service.ts
-        products-service.types.ts
-      orders/
-        orders-service.ts
-        orders-service.types.ts
-    types/
-      auth.ts
-      http.ts
-      entities/
-        *.ts
-    docs/
-      swagger-docs.ts
-```
-
-## Архитектура
-
-Слои:
-
-1. `routes` — связывание URL и контроллеров.
-2. `controllers` — HTTP-уровень (req/res, коды ответов, вызов сервисов).
-3. `services` — бизнес-логика.
-4. `repositories` — SQL и работа с БД.
-5. `db` — подключение к PostgreSQL.
-
-Принцип зависимостей: `routes -> controllers -> services -> repositories -> db`.
-
-## Типизация
-
-Правила работы с типами:
-
-1. Бизнес-сущности хранятся в `src/types/entities`.
-2. Типы конкретного сервиса хранятся рядом с сервисом в `*-service.types.ts`.
-3. Сервис использует типы из своего `*-service.types.ts`.
-4. Если контроллеру нужен тип сервиса, он импортирует его из `services/<entity>/<entity>-service.types.ts`.
-5. HTTP-ошибки и общие транспортные типы — в `src/types/http.ts`.
-
-## API
-
-Базовый префикс: `/api`
-
-- `GET /api/health`
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/categories`
-- `GET /api/products`
-- `GET /api/cart/me` (JWT: `client`, `admin`)
-- `POST /api/orders` (JWT: `client`, `admin`)
-
-Сейчас реализованы `health` и `auth`. Остальные endpoint'ы пока возвращают `501 Not implemented`.
-
-## OpenAPI и Swagger
-
-- OpenAPI-файл: `openapi.yaml`
-- Swagger UI: `GET /docs`
-- Сырой OpenAPI: `GET /openapi.yaml`
+- Node.js `>= 20`
+- Yarn `1.x`
+- PostgreSQL `>= 13`
 
 ## Переменные окружения
 
-Скопируйте `.env.example` в `.env` и заполните:
+Создайте файл `.env` в папке `backend` (можно скопировать из `.env.example`):
 
-- `NODE_ENV`
-- `PORT`
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_MAX_POOL_SIZE`
-- `JWT_SECRET`
-- `JWT_EXPIRES_IN`
+```env
+NODE_ENV=development
+PORT=3000
 
-## Запуск
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=sushi_delivery_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_MAX_POOL_SIZE=10
+
+JWT_SECRET=change_me_to_long_random_secret
+JWT_EXPIRES_IN=7d
+```
+
+## Локальный запуск
+
+1. Установите зависимости:
 
 ```bash
+cd backend
 yarn install
+```
+
+2. Создайте БД в PostgreSQL (например, `sushi_delivery_db`).
+
+3. Примените миграции вручную в порядке версий:
+
+```bash
+psql -h localhost -U postgres -d sushi_delivery_db -f db/migrations/V1__init.sql
+psql -h localhost -U postgres -d sushi_delivery_db -f db/migrations/V2__add_order_address_and_comment.sql
+```
+
+4. (Опционально) Заполните тестовыми данными:
+
+```bash
+yarn db:seed
+yarn db:seed:products
+```
+
+5. Запустите backend:
+
+```bash
 yarn dev
 ```
 
-Сборка/запуск:
+API будет доступен на `http://localhost:3000/api`.
 
-```bash
-yarn build
-yarn start
-```
+## Скрипты
 
-## Работа с БД
+- `yarn dev` — запуск в режиме разработки (`tsx watch`)
+- `yarn build` — сборка TypeScript
+- `yarn start` — запуск собранного приложения
+- `yarn db:seed` — базовый сид (роли/пользователи/категории/часть товаров)
+- `yarn db:seed:products` — сид каталога (по 10 товаров в категории)
+- `yarn db:seed:clear` — очистка данных таблиц
+- `yarn db:seed:fresh` — очистка + базовый сид
 
-Источник истины схемы: миграции в `db/migrations`.
+## OpenAPI / Swagger
 
-Правила:
+- Swagger UI: `http://localhost:3000/docs`
+- OpenAPI JSON/YAML: `http://localhost:3000/openapi.yaml`
 
-1. Не редактировать уже примененные миграции.
-2. Любое изменение схемы делать новой миграцией (`V2__...sql`, `V3__...sql`).
-3. Именовать миграции по смыслу изменения.
+## Реализованные endpoint'ы
 
-Скрипты заполнения тестовыми данными:
+Префикс: `/api`
 
-- `yarn db:seed` — идемпотентно заполняет БД ролями, пользователями, категориями и товарами.
-- `yarn db:seed:clear` — очищает данные таблиц (сброс identity).
-- `yarn db:seed:fresh` — сначала очистка, затем заполнение.
-
-## Соглашения по ответам
-
-- Успешные ответы: JSON.
-- Ошибки: JSON
-
-```json
-{ "error": "message" }
-```
-
-Коды:
-
-- `200` / `201` — успех
-- `400` — ошибка валидации
-- `401` — не авторизован
-- `403` — недостаточно прав
-- `404` — не найдено
-- `500` — внутренняя ошибка
+- `GET /health`
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /categories`
+- `GET /products`
+- `GET /products/:productId`
+- `GET /cart/me` (JWT: `client`, `admin`)
+- `POST /cart/items` (JWT: `client`, `admin`)
+- `PATCH /cart/items/:productId/decrement` (JWT: `client`, `admin`)
+- `DELETE /cart/items/:productId` (JWT: `client`, `admin`)
+- `POST /orders` (JWT: `client`, `admin`)
+- `GET /orders/my` (JWT: `client`, `admin`)
