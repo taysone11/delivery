@@ -14,6 +14,8 @@ export interface Order {
   id: number;
   userId: number | null;
   cartId: number | null;
+  address: string;
+  comment: string | null;
   status: OrderStatus;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
@@ -37,6 +39,8 @@ export interface OrderItem {
 
 export interface CreateOrderRequest {
   cartId: number;
+  address: string;
+  comment?: string;
 }
 
 export interface CreateOrderResponse {

@@ -19,6 +19,8 @@ interface OrderRow {
   id: number;
   userId: number | null;
   cartId: number | null;
+  address: string;
+  comment: string | null;
   status: Order['status'];
   paymentMethod: Order['paymentMethod'];
   paymentStatus: Order['paymentStatus'];
@@ -41,6 +43,8 @@ function toOrder(row: OrderRow): Order {
     id: row.id,
     userId: row.userId,
     cartId: row.cartId,
+    address: row.address,
+    comment: row.comment,
     status: row.status,
     paymentMethod: row.paymentMethod,
     paymentStatus: row.paymentStatus,
@@ -106,16 +110,18 @@ export async function getCartItemsWithPrice(client: PoolClient, cartId: number):
 
 export async function createOrder(
   client: PoolClient,
-  data: { userId: number; cartId: number; total: number }
+  data: { userId: number; cartId: number; address: string; comment: string | null; total: number }
 ): Promise<Order> {
   const result = await client.query<OrderRow>(
     `
-      INSERT INTO orders (user_id, cart_id, total)
-      VALUES ($1, $2, $3)
+      INSERT INTO orders (user_id, cart_id, address, comment, total)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING
         id,
         user_id AS "userId",
         cart_id AS "cartId",
+        address,
+        comment,
         status,
         payment_method AS "paymentMethod",
         payment_status AS "paymentStatus",
@@ -124,7 +130,7 @@ export async function createOrder(
         created_at AS "createdAt",
         updated_at AS "updatedAt"
     `,
-    [data.userId, data.cartId, data.total]
+    [data.userId, data.cartId, data.address, data.comment, data.total]
   );
 
   return toOrder(result.rows[0]);

@@ -25,6 +25,13 @@ export async function createOrderService(userId: number, input: CreateOrderInput
     throw createHttpError('cartId must be a positive integer', 400);
   }
 
+  const address = input.address?.trim();
+  if (!address) {
+    throw createHttpError('address is required', 400);
+  }
+
+  const comment = input.comment?.trim() || null;
+
   return withTransaction(async (client) => {
     const cart = await findUserCartById(client, input.cartId, userId);
     if (!cart) {
@@ -44,6 +51,8 @@ export async function createOrderService(userId: number, input: CreateOrderInput
     const order = await createOrder(client, {
       userId,
       cartId: cart.id,
+      address,
+      comment,
       total
     });
 

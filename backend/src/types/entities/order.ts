@@ -6,6 +6,8 @@ export interface Order {
   id: number;
   userId: number | null;
   cartId: number | null;
+  address: string;
+  comment: string | null;
   status: OrderStatus;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;

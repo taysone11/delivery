@@ -2,24 +2,60 @@ import { getPool } from '../db/pool';
 import type { Cart, CartItem } from '../types/entities';
 
 interface CartRow {
-  id: number;
-  userId: number;
+  id: number | string;
+  userId: number | string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface CartItemRow {
-  id: number;
-  cartId: number;
-  productId: number;
-  price: number;
-  quantity: number;
+  id: number | string;
+  cartId: number | string;
+  productId: number | string;
+  price: number | string;
+  quantity: number | string;
   createdAt: string;
   updatedAt: string;
 }
 
 interface ProductExistsRow {
   exists: boolean;
+}
+
+function toSafeInteger(value: number | string, fieldName: string): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error(`Invalid ${fieldName} value from database: ${String(value)}`);
+  }
+
+  return parsed;
+}
+
+function toCart(row: CartRow): Cart {
+  return {
+    id: toSafeInteger(row.id, 'cart.id'),
+    userId: toSafeInteger(row.userId, 'cart.userId'),
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt
+  };
+}
+
+function toCartItem(row: CartItemRow): CartItem {
+  const price = typeof row.price === 'number' ? row.price : Number(row.price);
+  if (!Number.isFinite(price)) {
+    throw new Error(`Invalid cart_items.price value from database: ${String(row.price)}`);
+  }
+
+  return {
+    id: toSafeInteger(row.id, 'cart_items.id'),
+    cartId: toSafeInteger(row.cartId, 'cart_items.cartId'),
+    productId: toSafeInteger(row.productId, 'cart_items.productId'),
+    price,
+    quantity: toSafeInteger(row.quantity, 'cart_items.quantity'),
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt
+  };
 }
 
 export async function getOrCreateCartByUserId(userId: number): Promise<Cart> {
@@ -51,7 +87,7 @@ export async function getOrCreateCartByUserId(userId: number): Promise<Cart> {
     [userId]
   );
 
-  return result.rows[0];
+  return toCart(result.rows[0]);
 }
 
 export async function listCartItems(cartId: number): Promise<CartItem[]> {
@@ -74,7 +110,7 @@ export async function listCartItems(cartId: number): Promise<CartItem[]> {
     [cartId]
   );
 
-  return result.rows;
+  return result.rows.map(toCartItem);
 }
 
 export async function isProductExists(productId: number): Promise<boolean> {
@@ -118,7 +154,7 @@ export async function addOrIncrementCartItem(
     [cartId, productId, quantity]
   );
 
-  return result.rows[0];
+  return toCartItem(result.rows[0]);
 }
 
 export async function removeCartItemByProductId(cartId: number, productId: number): Promise<boolean> {

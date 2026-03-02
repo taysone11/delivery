@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { CartPage } from '../pages/CartPage/CartPage';
+import { CheckoutPage } from '../pages/CheckoutPage/CheckoutPage';
 import { CatalogPage } from '../pages/CatalogPage/CatalogPage';
 import { HomePage } from '../pages/HomePage/HomePage';
 import { LoginPage } from '../pages/LoginPage/LoginPage';
@@ -20,6 +21,7 @@ export function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>

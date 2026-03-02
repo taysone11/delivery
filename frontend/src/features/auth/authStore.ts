@@ -4,6 +4,7 @@ import { login as loginRequest, register as registerRequest } from '../../shared
 import type { AuthUser } from '../../shared/api/endpoints/auth/auth.types';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
+const AUTH_USER_KEY = 'authUser';
 
 export type User = AuthUser;
 
@@ -29,15 +30,32 @@ export const useAuthStore = create<AuthState>((set) => ({
   hydrate: () => {
     const token = window.localStorage.getItem(ACCESS_TOKEN_KEY);
     const accessToken = token && token.trim().length > 0 ? token : null;
+    const serializedUser = window.localStorage.getItem(AUTH_USER_KEY);
+
+    let user: User | null = null;
+    if (serializedUser) {
+      try {
+        user = JSON.parse(serializedUser) as User;
+      } catch {
+        user = null;
+      }
+    }
+
+    const hydratedUser = accessToken ? user : null;
+    if (!accessToken) {
+      window.localStorage.removeItem(AUTH_USER_KEY);
+    }
 
     set({
       accessToken,
+      user: hydratedUser,
       isHydrated: true
     });
   },
   login: async (email: string, password: string) => {
     const response = await loginRequest({ email, password });
     window.localStorage.setItem(ACCESS_TOKEN_KEY, response.token);
+    window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
 
     set({
       accessToken: response.token,
@@ -48,6 +66,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (payload) => {
     const response = await registerRequest(payload);
     window.localStorage.setItem(ACCESS_TOKEN_KEY, response.token);
+    window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
 
     set({
       accessToken: response.token,
@@ -57,6 +76,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   logout: () => {
     window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+    window.localStorage.removeItem(AUTH_USER_KEY);
 
     set({
       accessToken: null,

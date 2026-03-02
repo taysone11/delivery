@@ -773,6 +773,8 @@ components:
           id,
           userId,
           cartId,
+          address,
+          comment,
           status,
           paymentMethod,
           paymentStatus,
@@ -796,6 +798,13 @@ components:
           format: int64
           nullable: true
           example: 5
+        address:
+          type: string
+          example: Москва, ул. Ленина, д. 10, кв. 15
+        comment:
+          type: string
+          nullable: true
+          example: Позвонить за 10 минут до приезда
         status:
           $ref: "#/components/schemas/OrderStatus"
         paymentMethod:
@@ -846,12 +855,19 @@ components:
 
     CreateOrderInput:
       type: object
-      required: [cartId]
+      required: [cartId, address]
       properties:
         cartId:
           type: integer
           format: int64
           example: 5
+        address:
+          type: string
+          example: Москва, ул. Ленина, д. 10, кв. 15
+        comment:
+          type: string
+          nullable: true
+          example: Без васаби
 
     CreateOrderResult:
       type: object

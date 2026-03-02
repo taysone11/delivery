@@ -28,6 +28,7 @@ export async function getMyCartService(userId: number): Promise<CartView> {
 
   const cart = await getOrCreateCartByUserId(userId);
   const items = await listCartItems(cart.id);
+  console.log(items);
 
   return { cart, items };
 }
