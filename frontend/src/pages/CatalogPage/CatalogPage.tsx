@@ -143,7 +143,7 @@ export function CatalogPage() {
             ) : (
               <Row gutter={[16, 16]}>
                 {products.map((product) => (
-                  <Col key={product.id} xs={24} sm={12} xl={8}>
+                  <Col key={product.id} xs={24} sm={12} xl={8} style={{ display: 'flex' }}>
                     <ProductCard
                       product={product}
                       onAddToCart={handleAddToCart}
